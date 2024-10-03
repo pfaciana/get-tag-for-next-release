@@ -1,0 +1,12 @@
+{
+	"name": "get-tag-for-next-release",
+	"version": "1.0.0",
+	"description": "Very small script to return the latest tag if it is not attached to a release",
+	"main": "index.js",
+	"author": "Phil Faciana <phil@renderdev.com> (https://renderdev.com/)",
+	"license": "MIT",
+	"dependencies": {
+		"@actions/core": "~1.10",
+		"@actions/github": "~6.0"
+	}
+}

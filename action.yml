@@ -1,0 +1,29 @@
+name: Get tag for next release
+description: Very small script to return the latest tag if it is not attached to a release
+outputs:
+  tag-name:
+    description: latest tag name or empty string if tag is already attached to a release
+    value: ${{ steps.check_release.outputs.tag-name }}
+runs:
+  using: composite
+  steps:
+    - name: Dump github context
+      if: env.DEBUG_MODE == 1
+      run: echo "$GITHUB_CONTEXT"
+      shell: bash
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+
+    - name: Node, npm versions, and install
+      run: |
+        node --version
+        npm --version
+        npm install
+        rm package-lock.json
+      shell: bash
+      working-directory: ${{ github.action_path }}
+
+    - name: Check for existing release
+      id: check_release
+      run: node ${{ env.DEBUG_MODE == '1' && '--inspect-brk=9229' || '' }} ${{ github.action_path }}/index.js
+      shell: bash
