@@ -1,5 +1,10 @@
 name: Get tag for next release
 description: Very small script to return the latest tag if it is not attached to a release
+inputs:
+  match-tag:
+    description: The tag name to match a release against
+    required: false
+    default: ''
 outputs:
   tag-name:
     description: latest tag name or empty string if tag is already attached to a release
@@ -27,3 +32,5 @@ runs:
       id: check_release
       run: node ${{ env.DEBUG_MODE == '1' && '--inspect-brk=9229' || '' }} ${{ github.action_path }}/index.js
       shell: bash
+      env:
+        MATCH_TAG: ${{ inputs.match-tag }}

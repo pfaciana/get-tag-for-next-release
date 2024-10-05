@@ -8,10 +8,11 @@ A GitHub Action that retrieves the latest tag from a repository and checks if it
 - Checks if the latest tag is already associated with a release
 - Provides a simple output for use in subsequent workflow steps
 - Supports debug mode for troubleshooting
+- Allows specifying a specific tag to check against releases
 
 ### How It Works
 
-This action uses the GitHub API to fetch the latest tag and list of releases for your repository. It then compares the latest tag with existing releases to determine if a new release is needed. The action is written in Node.js and utilizes the `@actions/core` and `@actions/github` packages to interact with the GitHub Actions environment.
+This action uses the GitHub API to fetch the latest tag and list of releases for your repository. It then compares the latest tag (or a specified tag) with existing releases to determine if a new release is needed. The action is written in Node.js and utilizes the `@actions/core` and `@actions/github` packages to interact with the GitHub Actions environment.
 
 ## Getting Started
 
@@ -55,22 +56,29 @@ jobs:
       - name: Get tag
         id: get_tag_name
         uses: pfaciana/get-tag-for-next-release
+        with:
+          match-tag: 'v1.2.3' # Optional: Specify a tag to check against releases
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEBUG_MODE: ${{ vars.DEBUG_MODE || '0' }}
 
       - name: Debug output
-        run: echo "Latest tag not attached to a release: ${{ steps.get_tag.outputs.tag-name }}"
+        run:
+          echo "Latest tag not attached to a release: ${{ steps.get_tag.outputs.tag-name }}"
 ```
 
 ### Inputs
 
-This action does not require any inputs. It uses the `GITHUB_TOKEN` environment variable for authentication, which is automatically provided by GitHub Actions.
+| Name      | Description                             | Required | Default |
+|-----------|-----------------------------------------|----------|---------|
+| match-tag | The tag name to match a release against | false    | ''      |
+
+> Typically, this will be a dynamic value from another workflow step or command line output.
 
 ### Outputs
 
-| Name     | Description                                                                            |
-|----------|----------------------------------------------------------------------------------------|
+| Name     | Description                                                                               |
+|----------|-------------------------------------------------------------------------------------------|
 | tag-name | The name of the latest tag if it's not attached to a release, or an empty string if it is |
 
 ## FAQ
@@ -89,8 +97,12 @@ A: No, this action only checks existing tags. It does not create new tags or rel
 
 ### Q: How does this action handle multiple tags pushed at once?
 
-A: The action only considers the most recent tag. If multiple tags are pushed simultaneously, only the latest one will be checked.
+A: The action considers the most recent tag if no specific tag is provided. If multiple tags are pushed simultaneously, only the latest one will be checked.
 
 ### Q: Can I use this action with private repositories?
 
 A: Yes, as long as the `GITHUB_TOKEN` has the necessary permissions to access the repository's tags and releases.
+
+### Q: Can I specify a particular tag to check against releases?
+
+A: Yes, you can use the `match-tag` input to specify a particular tag. If left empty, the action will use the latest tag.
